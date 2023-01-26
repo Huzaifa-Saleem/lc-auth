@@ -144,7 +144,24 @@ export async function getUser(req, res) {
 
 /** USER PUT : http://localhost:8080/api/updateuser  */
 export async function updateUser(req, res) {
-  res.json("register route");
+  try {
+    const id = req.query.id;
+
+    if (id) {
+      const body = req.body;
+
+      //update the data
+      UserModel.updateOne({ _id: id }, body, function (err, data) {
+        if (err) throw err;
+
+        return res.status(201).send({ msg: "User Updated Successfuly...!" });
+      });
+    } else {
+      return res.status(401).send({ error: "User not found...!" });
+    }
+  } catch (error) {
+    return res.status(401).send({ error });
+  }
 }
 
 /** OTP GET : http://localhost:8080/api/generateOTP  */
