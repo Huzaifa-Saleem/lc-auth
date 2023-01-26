@@ -96,7 +96,7 @@ export async function login(req, res) {
         .compare(password, user.password)
         .then((passwordCheck) => {
           if (!passwordCheck)
-            return res.status(400).send({ error: "Don't have Password" });
+            return res.status(400).send({ error: "Password is Incorrect...!" });
 
           //create jwt token
           const token = jwt.sign(
@@ -188,10 +188,48 @@ export async function verifyOTP(req, res) {
 
 /** resetSESSION GET : http://localhost:8080/api/createResetSession  */
 export async function createResetSession(req, res) {
-  res.json("register route");
+  if (req.app.locals.resetSession) {
+    return res.status(201).send({ flag: req.app.locals.resetSession });
+  }
+  return res.status(440).send({ error: "Session expired!" });
 }
 
 /** resetPass GET : http://localhost:8080/api/resetPassword  */
 export async function resetPassword(req, res) {
-  res.json("register route");
+  try {
+    if (!req.app.locals.resetSession)
+      return res.status(440).send({ error: "Session expired!" });
+    const { username, password } = req.body;
+
+    try {
+      UserModel.findOne({ username })
+        .then((user) => {
+          bcrypt
+            .hash(password, 10)
+            .then((hashedPassword) => {
+              UserModel.updateOne(
+                { username: user.username },
+                { password: hashedPassword },
+                function (err, data) {
+                  if (err) throw err;
+                  req.app.locals.resetSession = false;
+                  return res
+                    .status(201)
+                    .send({ msg: "Updated Successfully...!" });
+                }
+              );
+            })
+            .catch((error) => {
+              return res.status(401).send({ error });
+            });
+        })
+        .catch((error) => {
+          return res.status(401).send({ error: "Username not found...!" });
+        });
+    } catch (error) {
+      return res.status(401).send({ error });
+    }
+  } catch (error) {
+    return res.status(401).send({ error });
+  }
 }
