@@ -1,9 +1,10 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import UserModel from "../model/user.model.js";
+import OTPGenerator from "otp-generator";
 
 /** MidleWare to verify user */
-export async function verifyUser(req, res) {
+export async function verifyUser(req, res, next) {
   try {
     const { username } = req.method == "GET" ? req.query : req.body;
 
@@ -145,13 +146,13 @@ export async function getUser(req, res) {
 /** USER PUT : http://localhost:8080/api/updateuser  */
 export async function updateUser(req, res) {
   try {
-    const id = req.query.id;
+    const { userId } = req.user;
 
-    if (id) {
+    if (userId) {
       const body = req.body;
 
       //update the data
-      UserModel.updateOne({ _id: id }, body, function (err, data) {
+      UserModel.updateOne({ _id: userId }, body, function (err, data) {
         if (err) throw err;
 
         return res.status(201).send({ msg: "User Updated Successfuly...!" });
@@ -164,14 +165,25 @@ export async function updateUser(req, res) {
   }
 }
 
-/** OTP GET : http://localhost:8080/api/generateOTP  */
+/** GENERATE OTP GET : http://localhost:8080/api/generateOTP  */
 export async function generateOTP(req, res) {
-  res.json("register route");
+  req.app.locals.OTP = await OTPGenerator.generate(6, {
+    lowerCaseAlphabets: false,
+    upperCaseAlphabets: false,
+    specialChars: false,
+  });
+  res.status(201).send({ code: req.app.locals.OTP });
 }
 
-/** OTP GET : http://localhost:8080/api/verifyOTP  */
+/** VERIFY OTP GET : http://localhost:8080/api/verifyOTP  */
 export async function verifyOTP(req, res) {
-  res.json("register route");
+  const { code } = req.query;
+  if (parseInt(req.app.locals.OTP) === parseInt(code)) {
+    req.app.locals.OTP = null; // reset the OTP value
+    req.app.locals.resetSession = true; // start session for reset password
+    return res.status(201).send({ msg: "Verify Successsfully!" });
+  }
+  return res.status(400).send({ error: "Invalid OTP" });
 }
 
 /** resetSESSION GET : http://localhost:8080/api/createResetSession  */
