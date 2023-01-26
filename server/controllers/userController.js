@@ -123,7 +123,23 @@ export async function login(req, res) {
 
 /** USER GET : http://localhost:8080/api/user/:username  */
 export async function getUser(req, res) {
-  res.json("register route");
+  const { username } = req.params;
+
+  try {
+    if (!username) return res.status(501).send({ error: "Invalid username" });
+
+    UserModel.findOne({ username }, function (err, user) {
+      if (err) return res.status(500).send({ err });
+      if (!user)
+        return res.status(501).send({ error: "Coudn't find the User" });
+
+      const { password, ...rest } = Object.assign({}, user.toJSON());
+
+      return res.status(200).send(rest);
+    });
+  } catch (error) {
+    return res.status(404).send({ error: "Cant find the user Data" });
+  }
 }
 
 /** USER PUT : http://localhost:8080/api/updateuser  */
