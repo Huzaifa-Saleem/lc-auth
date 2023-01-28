@@ -1,8 +1,18 @@
 import React from "react";
-import "./App.css";
+import { BrowserRouter } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
+//
+import Routes from "./Routes";
 
 function App() {
-  return <div>hello world</div>;
+  return (
+    <>
+      <BrowserRouter>
+        <Toaster position="top-center" reverseOrder={true} />
+        <Routes />
+      </BrowserRouter>
+    </>
+  );
 }
 
 export default App;
