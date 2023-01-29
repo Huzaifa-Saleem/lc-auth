@@ -1,35 +1,62 @@
-import React from "react";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 //
-import BgImage from "../components/BgImage";
 import Card from "../components/Card";
 import Input from "../components/Input";
 import Meta from "../components/Meta";
-import Head from "../layout/Head";
 import Button from "../components/Button";
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { RegisterUser } from "../helper/ApiFn";
 //
 
 export default function Register() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
   const [file, setFile] = useState();
-
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   //
   const navigate = useNavigate();
+
+  const data = { username, password, email, profile: file };
+
+  //handle submit
+  const handleSubmit = () => {
+    if (
+      username === "" ||
+      email === "" ||
+      password === "" ||
+      confirmPassword === ""
+    )
+      return toast.error("Please Fill All Fields...!");
+
+    //check password matching
+    if (password !== confirmPassword)
+      return toast.error("Password Doesn't Match...!", {
+        id: 1,
+        duration: 10000,
+      });
+
+    toast.loading("loading...!");
+    RegisterUser(data)
+      .then((res) => {
+        toast.success("Register Successfully...!", { id: 1 });
+
+        navigate("/");
+      })
+      .catch((error) => {
+        toast.error(error?.response?.data?.error?.error, { id: 1 });
+      });
+  };
 
   //handle file input
   const onUpload = async (e) => {
     // const base64 = await convertToBase64(e.target.files[0]);
-
     setFile(URL.createObjectURL(e.target.files[0]));
   };
   return (
     <div>
-      <Meta title={"LC-AUTH | Login"} />
-      <BgImage />
-      <Head />
+      <Meta title={"LC-AUTH | Register"} />
       <Card>
         <div>
           <h1 style={{ fontSize: 30, fontWeight: "500" }}>
@@ -80,7 +107,7 @@ export default function Register() {
             type="email"
             placeholder="Email"
             onChange={(e) => {
-              setUsername(e.target.value);
+              setEmail(e.target.value);
             }}
             icon="email"
           />
@@ -95,19 +122,14 @@ export default function Register() {
           />
           <Input
             onChange={(e) => {
-              setPassword(e.target.value);
+              setConfirmPassword(e.target.value);
             }}
             type="password"
             icon="password"
             placeholder="Confirm Password"
           />
 
-          <Button
-            title="SIGN UP"
-            onClick={() => {
-              navigate("/");
-            }}
-          />
+          <Button title="SIGN UP" onClick={handleSubmit} />
         </div>
 
         <div>

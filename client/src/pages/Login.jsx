@@ -1,25 +1,15 @@
-import React from "react";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 //
-import BgImage from "../components/BgImage";
 import Card from "../components/Card";
 import Input from "../components/Input";
 import Meta from "../components/Meta";
-import Head from "../layout/Head";
 import Button from "../components/Button";
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-//
 import { loginUser, VerifyUser } from "../helper/ApiFn";
+//
 
 /** toast option  */
-const toastOptions = {
-  duration: 2000,
-  style: {
-    background: "#101010",
-    color: "rgba(255,255,255,.5)",
-  },
-};
 
 export default function Login() {
   const [username, setUsername] = useState("");
@@ -34,7 +24,7 @@ export default function Login() {
 
     // show passowrd input condition
     if (username === "") {
-      return toast.error("Please enter your Username ...!", toastOptions);
+      return toast.error("Please enter your Username ...!");
     }
 
     // Verify Username
@@ -42,13 +32,13 @@ export default function Login() {
       .then((res) => {
         // if username verified then
         console.log(res);
-        toast.success("User Authenticated...!", toastOptions);
+        toast.success("User Authenticated...!");
         return setShowPassInput(true);
       })
       .catch((err) => {
         //if username not verified
         console.log(err);
-        toast.error(err?.error, toastOptions);
+        toast.error(err?.error);
         return setShowPassInput(false);
       });
   };
@@ -64,20 +54,18 @@ export default function Login() {
     loginUser({ username, password })
       .then((res) => {
         console.log(res.data);
-        toast.success(`Welcome ${res?.data?.username}`, toastOptions);
+        toast.success(`Welcome ${res?.data?.username}`);
         localStorage.setItem("token", res?.data?.token);
         navigate(`/user/${username}`);
       })
       .catch((err) => {
-        return toast.error("Wrong Credentials ...!", toastOptions);
+        return toast.error("Wrong Credentials ...!");
       });
   };
 
   return (
     <div>
       <Meta title={"LC-AUTH | Login"} />
-      <BgImage />
-      <Head />
       <Card>
         <div>
           <h1 style={{ fontSize: 30, fontWeight: "500" }}>Sign In</h1>

@@ -8,7 +8,7 @@ import {
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import { useState } from "react";
 
-export default function Input({ type, icon, sty, ...other }) {
+export default function Input({ type, value, icon, sty, ...other }) {
   const [passVisible, setPassVisible] = useState(true);
 
   //return pass visible or not icon
@@ -110,6 +110,7 @@ export default function Input({ type, icon, sty, ...other }) {
 
       <input
         type={passVisible ? type : "text"}
+        value={value}
         style={{ paddingLeft: icon ? 45 : 20 }}
         className="customInput"
         {...other}

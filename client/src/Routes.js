@@ -7,32 +7,57 @@ import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
 import VerifyOTP from "./pages/VerifyOTP";
 import ChnagePassowrd from "./pages/ChnagePassowrd";
+import { Authenticated, PrivateRoute } from "./middleware/authRoute";
 
 export default function Routes() {
   const Routes = useRoutes([
     {
       path: "/",
-      element: <Login />,
+      element: (
+        <PrivateRoute>
+          <Login />
+        </PrivateRoute>
+      ),
     },
     {
       path: "/register",
-      element: <Register />,
+      element: (
+        <PrivateRoute>
+          <Register />
+        </PrivateRoute>
+      ),
     },
     {
       path: "/user/:username",
-      element: <Profile />,
+      element: (
+        <Authenticated>
+          <Profile />
+        </Authenticated>
+      ),
     },
     {
       path: "/forgotPassword",
-      element: <ForgotPassword />,
+      element: (
+        <PrivateRoute>
+          <ForgotPassword />
+        </PrivateRoute>
+      ),
     },
     {
-      path: "/verifyotp",
-      element: <VerifyOTP />,
+      path: "/verifyotp/:username",
+      element: (
+        <PrivateRoute>
+          <VerifyOTP />
+        </PrivateRoute>
+      ),
     },
     {
-      path: "/chnagePassowrd",
-      element: <ChnagePassowrd />,
+      path: "/chnagePassword/:username",
+      element: (
+        <PrivateRoute>
+          <ChnagePassowrd />
+        </PrivateRoute>
+      ),
     },
     {
       path: "*",

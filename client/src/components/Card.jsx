@@ -1,6 +1,3 @@
-import React from "react";
-//@ts-ignore
-//@ts-nocheck
 export default function Card({ children }) {
   return (
     <div

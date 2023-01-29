@@ -1,41 +1,53 @@
-import React from "react";
+import { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-hot-toast";
 //
-import BgImage from "../components/BgImage";
+import Button from "../components/Button";
 import Card from "../components/Card";
 import Input from "../components/Input";
 import Meta from "../components/Meta";
-import Head from "../layout/Head";
-import Button from "../components/Button";
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { getUserDetail, updatedUser } from "../helper/ApiFn";
 //
 
 export default function Profile() {
-  const [username, setUsername] = useState("");
+  const [user, setUser] = useState("");
   const [email, setEmail] = useState("");
   const [num, setNum] = useState("");
   const [address, setAddress] = useState("");
   const [file, setFile] = useState();
-
   //
   const navigate = useNavigate();
+  const { username } = useParams();
 
-  //handle file input
-  const onUpload = async (e) => {
-    // const base64 = await convertToBase64(e.target.files[0]);
+  useEffect(() => {
+    getUserDetail(username)
+      .then((res) => {
+        setUser(res?.data?.username);
+        setEmail(res?.data?.email);
+        setNum(res?.data?.mobile);
+        setFile(res?.data?.profile);
+        setAddress(res?.data?.address);
+      })
+      .catch((error) => {
+        toast.error(error.message);
+        // console.log(error);
+      });
+  }, [username]);
 
-    setFile(URL.createObjectURL(e.target.files[0]));
+  const handleUpdate = () => {
+    updatedUser({ username: user, email, address, mobile: num, profile: file })
+      .then((res) => toast.success(res?.data.msg))
+      .catch((error) => toast.error(error.data));
   };
+
   return (
     <div>
       <Meta title={"LC-AUTH | Login"} />
-      <BgImage />
-      <Head />
+
       <Card>
-        <div>
-          <h1 style={{ fontSize: 30, fontWeight: "500" }}>
-            Create Your Account
+        <div style={{ textAlign: "center" }}>
+          <h1 style={{ fontSize: 30, fontWeight: "400" }}>
+            Welcome <span style={{ fontWeight: "600" }}>{username}</span>
           </h1>
           <p
             style={{
@@ -46,7 +58,7 @@ export default function Profile() {
               opacity: 0.7,
             }}
           >
-            Enter your credentials to continue...!
+            You can check or update your details here
           </p>
           <div
             style={{ display: "flex", justifyContent: "center" }}
@@ -64,7 +76,7 @@ export default function Profile() {
             </label>
 
             <input
-              onChange={onUpload}
+              onChange={(e) => setFile(URL.createObjectURL(e.target.files[0]))}
               type="file"
               id="profile"
               name="profile"
@@ -74,13 +86,15 @@ export default function Profile() {
             type="text"
             placeholder="Username"
             onChange={(e) => {
-              setUsername(e.target.value);
+              setUser(e.target.value);
             }}
+            value={user}
             icon="user"
           />
           <Input
             type="email"
             placeholder="Email"
+            value={email}
             onChange={(e) => {
               setEmail(e.target.value);
             }}
@@ -92,6 +106,7 @@ export default function Profile() {
               setNum(e.target.value);
             }}
             type="text"
+            value={num}
             icon="phone"
             placeholder="Phone No."
           />
@@ -100,16 +115,12 @@ export default function Profile() {
               setAddress(e.target.value);
             }}
             type="text"
+            value={address}
             icon="location"
             placeholder="Address"
           />
 
-          <Button
-            title="UPDATE"
-            onClick={() => {
-              navigate("/");
-            }}
-          />
+          <Button title="UPDATE" onClick={handleUpdate} />
         </div>
 
         <div>
@@ -120,12 +131,14 @@ export default function Profile() {
               marginTop: 20,
               opacity: 0.7,
               textAlign: "center",
+              cursor: "pointer",
+            }}
+            onClick={() => {
+              localStorage.clear();
+              navigate("/");
             }}
           >
-            Already have an account?{" "}
-            <Link style={{ color: "#18dad0" }} to={"/"}>
-              Sign In
-            </Link>
+            LOGOUT
           </p>
         </div>
       </Card>

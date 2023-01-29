@@ -1,5 +1,3 @@
-import React from "react";
-//
 import bg from "../assets/bg.png";
 
 const bgStyle = {

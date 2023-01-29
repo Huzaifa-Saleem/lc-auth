@@ -1,14 +1,12 @@
-import React from "react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 //
-import BgImage from "../components/BgImage";
 import Card from "../components/Card";
 import Input from "../components/Input";
 import Meta from "../components/Meta";
-import Head from "../layout/Head";
 import Button from "../components/Button";
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { SendOTP } from "../helper/ApiFn";
 //
 
 export default function ForgotPassword() {
@@ -16,15 +14,29 @@ export default function ForgotPassword() {
   //
   const navigate = useNavigate();
 
-  const handleSubmit = () => {
-    navigate("/verifyotp");
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    toast.loading("loading...", { id: "OTP" });
+
+    //check username
+    if (username === "") return toast.error("Please Enter Your Username...!");
+
+    //sending OTP
+    SendOTP(username)
+      .then((res) => {
+        toast.success("Please Check Your Email For OTP...!", { id: "OTP" });
+        navigate(`/verifyotp/${username}`);
+      })
+      .catch((error) =>
+        toast.error(error?.response?.data?.error, { id: "OTP" })
+      );
   };
 
   return (
     <div>
-      <Meta title={"LC-AUTH | Login"} />
-      <BgImage />
-      <Head />
+      <Meta title={"LC-AUTH | Forgot Password"} />
+
       <Card>
         <div>
           <h1 style={{ fontSize: 30, fontWeight: "500" }}>Forgot Password</h1>
@@ -39,16 +51,18 @@ export default function ForgotPassword() {
           >
             Enter your Credentials to continue...!
           </p>
-          <Input
-            type="text"
-            placeholder="Username"
-            onChange={(e) => {
-              setUsername(e.target.value);
-            }}
-            icon="user"
-          />
+          <form onSubmit={handleSubmit}>
+            <Input
+              type="text"
+              placeholder="Username"
+              onChange={(e) => {
+                setUsername(e.target.value);
+              }}
+              icon="user"
+            />
 
-          <Button title={"SEND OTP"} onClick={handleSubmit} />
+            <Button title={"SEND OTP"} onClick={handleSubmit} />
+          </form>
         </div>
 
         <div></div>
