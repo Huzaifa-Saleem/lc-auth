@@ -8,26 +8,31 @@ import router from "./router/userRouter.js";
 
 const app = express();
 
+/** Cors Option */
+const corsOptions = {
+  origin: "*",
+  optionsSuccessStatus: 200,
+};
+
 /** middlewares */
 app.use(express.json());
-app.use(cors());
 app.use(morgan("dev"));
 app.disable("x-powered-by");
-
-const PORT = 8080;
-
-/** http get request */
-app.get("/", (req, res) => {
-  res.status(200).json("get response HOME");
-});
+app.use("/upload", express.static("upload"));
+app.use(cors(corsOptions));
 
 /** api Routes of User */
 app.use("/api", router);
+
+// check
+app.use("/", (req, res) => {
+  res.send({ message: "server is workinig" });
+});
 
 /** db connection */
 connect();
 
 /** start server */
-app.listen(PORT, () => {
-  console.log("server started on port ==>", PORT);
+app.listen(process.env.PORT, () => {
+  console.log("server started on port ==>", process.env.PORT);
 });

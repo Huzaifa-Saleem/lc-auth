@@ -12,6 +12,7 @@ function App() {
     <>
       <BrowserRouter>
         <BgImage />
+
         <Head />
         <Toaster
           position="top-center"

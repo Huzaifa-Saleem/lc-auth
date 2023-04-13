@@ -11,6 +11,7 @@ import { RegisterUser } from "../helper/ApiFn";
 
 export default function Register() {
   const [file, setFile] = useState();
+  const [profile, setProfile] = useState();
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -18,7 +19,8 @@ export default function Register() {
   //
   const navigate = useNavigate();
 
-  const data = { username, password, email, profile: file };
+  const data = { username, password, email };
+  const formData = new FormData();
 
   //handle submit
   const handleSubmit = () => {
@@ -38,7 +40,13 @@ export default function Register() {
       });
 
     toast.loading("loading...!");
-    RegisterUser(data)
+
+    formData.append("username", username);
+    formData.append("password", password);
+    formData.append("email", email);
+    formData.append("profile", file);
+
+    RegisterUser(formData, data)
       .then((res) => {
         toast.success("Register Successfully...!", { id: 1 });
 
@@ -51,8 +59,10 @@ export default function Register() {
 
   //handle file input
   const onUpload = async (e) => {
-    // const base64 = await convertToBase64(e.target.files[0]);
-    setFile(URL.createObjectURL(e.target.files[0]));
+    e.preventDefault();
+
+    setProfile(URL.createObjectURL(e.target.files[0]));
+    setFile(e.target.files[0]);
   };
   return (
     <div>
@@ -80,7 +90,7 @@ export default function Register() {
             <label htmlFor="profile">
               <img
                 src={
-                  file ||
+                  profile ||
                   "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460__340.png"
                 }
                 className="profile_img"

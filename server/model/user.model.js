@@ -5,11 +5,13 @@ export const userSchema = new mongoose.Schema({
     type: String,
     required: [true, "Please Provide a Username"],
     unique: [true, "Username Already Exist"],
+    minLength: [5, "Username cannot be less then 5 Characters...!"],
   },
   password: {
     type: String,
     required: [true, "Please Provide a Password"],
     unique: false,
+    minLength: [6, "Username cannot be less then 6 Characters...!"],
   },
   email: {
     type: String,

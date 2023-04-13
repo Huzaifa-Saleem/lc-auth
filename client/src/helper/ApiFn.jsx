@@ -1,7 +1,9 @@
 import axios from "axios";
 
 //base url
-axios.defaults.baseURL = "http://localhost:8080";
+// axios.defaults.baseURL = "https://lc-auth-api.onrender.com/";
+axios.defaults.baseURL = "http://localhost:8080/";
+// axios.defaults.baseURL = "https://api-lc-auth.onrender.com/";
 
 /** Verify username */
 export const VerifyUser = async (username) => {
@@ -57,16 +59,16 @@ export const updatedUser = async (updatedData) => {
 };
 
 /** Regisyter user */
-export const RegisterUser = async (credentials) => {
+export const RegisterUser = async (credentials, emailData) => {
   try {
     const { data } = await axios.post("/api/register", credentials);
 
     //sending mail to registered email
     const emaildata = await axios.post("/api/registerMail", {
-      username: credentials.username,
-      userEmail: credentials.email,
+      username: emailData.username,
+      userEmail: emailData.email,
       text: `
-        Dear ${credentials.username},
+        Dear ${emailData.username},
         ${"\n"}
         Thank you for registering on our website! We are excited to have you join our community. 
         ${"\n"}
@@ -76,7 +78,7 @@ export const RegisterUser = async (credentials) => {
         ${"\n"}
         Sincerely,
         ${"asda"}`,
-      subject: `Welcome ${credentials.username}`,
+      subject: `Welcome ${emailData.username}`,
     });
 
     return Promise.resolve(data, emaildata);

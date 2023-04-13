@@ -28,7 +28,8 @@ export async function verifyUser(req, res, next) {
  */
 export async function register(req, res) {
   try {
-    const { username, password, profile, email } = req.body;
+    const { username, password, email } = req.body;
+    const profile = `http://localhost:8080/upload/${req.file.filename}`;
 
     // check the existing user
     const existUsername = new Promise((resolve, reject) => {
@@ -67,7 +68,9 @@ export async function register(req, res) {
               user
                 .save()
                 .then((result) =>
-                  res.status(201).send({ msg: "User Register Successfully" })
+                  res
+                    .status(201)
+                    .send({ msg: "User Register Successfully", user })
                 )
                 .catch((error) => res.status(500).send({ error }));
             })
@@ -141,6 +144,16 @@ export async function getUser(req, res) {
   } catch (error) {
     return res.status(404).send({ error: "Cant find the user Data" });
   }
+}
+
+/** GET_ALL_USERS GET : http://localhost:8080/api/getusers*/
+export async function getAllUsers(req, res) {
+  const users = await UserModel.find();
+
+  res.status(200).json({
+    success: true,
+    users,
+  });
 }
 
 /** USER PUT : http://localhost:8080/api/updateuser  */
